@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, User, Menu, X, ChevronRight, Zap } from "lucide-react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import {
-  OrbitControls,
   PerspectiveCamera,
   Environment,
   ContactShadows,
@@ -19,6 +18,7 @@ import { RoundedPaddleModel } from "@/components/RoundedPaddleModel";
 import { SetModel } from "@/components/SetModel";
 import { prices } from "@/constants";
 import { useBreakpoint } from "@/hooks/use-mobile";
+import { ModelControls } from "@/components/ModelControls";
 
 export default function Page() {
   const [activeItem, setActiveItem] = useState<"Pickleball" | "Paddle" | "Set">(
@@ -79,6 +79,9 @@ export default function Page() {
     tl.set(groupRef.current.position, {
       y: 2,
     });
+
+    // Reset rotation instantly
+    groupRef.current.rotation.set(0, 0, 0);
 
     // Enter animation
     tl.to(groupRef.current.position, {
@@ -171,14 +174,7 @@ export default function Page() {
               far={4.5}
             />
 
-            <OrbitControls
-              enableZoom={false}
-              enablePan={false}
-              autoRotate={true}
-              autoRotateSpeed={2}
-              maxPolarAngle={Math.PI / 2}
-              minPolarAngle={Math.PI / 2}
-            />
+            <ModelControls groupRef={groupRef} activeItem={activeItem} />
           </Canvas>
         </div>
 

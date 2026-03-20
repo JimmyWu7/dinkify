@@ -25,10 +25,10 @@ export const SetModel = ({ scale = 1, color = 0xd4ff00 }: SetModelProps) => {
   return (
     <group ref={groupRef} scale={scale}>
       <group position={[-1, 0, 0]} rotation={[0, 0.5, 0.2]}>
-        <RoundedPaddleModel scale={scale} />
+        <RoundedPaddleModel />
       </group>
       <group position={[1, 0, 0.5]}>
-        <PickleballModel scale={scale * 0.7} />
+        <PickleballModel scale={0.7} />
       </group>
     </group>
   );
