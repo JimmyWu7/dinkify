@@ -5,7 +5,15 @@ import { useFrame } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
 
-export const RoundedPaddleModel = () => {
+interface RoundedpaddleModelProps {
+  scale?: number;
+  color?: number;
+}
+
+export const RoundedPaddleModel = ({
+  scale = 1,
+  color = 0xd4ff00,
+}: RoundedpaddleModelProps) => {
   const groupRef = useRef<THREE.Group>(null);
 
   const paddleShape = useMemo(() => {
@@ -51,8 +59,8 @@ export const RoundedPaddleModel = () => {
   });
 
   return (
-    <Float speed={3} rotationIntensity={0.5} floatIntensity={2}>
-      <group ref={groupRef} position={[0, 0.5, 0]}>
+    <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+      <group ref={groupRef} position={[0, 0.50, 0]} scale={scale}>
         {/* Main Paddle Face */}
         <mesh castShadow receiveShadow>
           <extrudeGeometry args={[paddleShape, extrudeSettings]} />
@@ -63,8 +71,8 @@ export const RoundedPaddleModel = () => {
         <mesh position={[0, 0, 0.06]}>
           <planeGeometry args={[0.2, 2.5]} />
           <meshStandardMaterial
-            color="#d4ff00"
-            emissive="#d4ff00"
+            color={color}
+            emissive={color}
             emissiveIntensity={0.5}
           />
         </mesh>
@@ -72,7 +80,7 @@ export const RoundedPaddleModel = () => {
         {/* Design: Logo Circle */}
         <mesh position={[0, 0.5, 0.07]}>
           <circleGeometry args={[0.3, 32]} />
-          <meshStandardMaterial color="#d4ff00" />
+          <meshStandardMaterial color={color} />
         </mesh>
 
         {/* Handle */}
@@ -85,7 +93,7 @@ export const RoundedPaddleModel = () => {
         <mesh position={[0, -1.8, 0.05]} rotation={[0, 0, 0]}>
           <cylinderGeometry args={[0.16, 0.19, 1.2, 32]} />
           <meshBasicMaterial
-            color="#d4ff00"
+            color={color}
             wireframe
             opacity={0.2}
             transparent

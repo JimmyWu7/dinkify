@@ -6,7 +6,12 @@ import * as THREE from "three";
 import { RoundedPaddleModel } from "./RoundedPaddleModel";
 import { PickleballModel } from "./PickleballModel";
 
-export const SetModel = () => {
+interface SetModelProps {
+  scale?: number;
+  color?: number;
+}
+
+export const SetModel = ({ scale = 1, color = 0xd4ff00 }: SetModelProps) => {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
@@ -18,12 +23,12 @@ export const SetModel = () => {
   });
 
   return (
-    <group ref={groupRef}>
-      <group position={[-1.5, 0, 0]} rotation={[0, 0.5, 0.2]}>
-        <RoundedPaddleModel />
+    <group ref={groupRef} scale={scale}>
+      <group position={[-1, 0, 0]} rotation={[0, 0.5, 0.2]}>
+        <RoundedPaddleModel scale={scale} />
       </group>
-      <group position={[1.5, 0, 0.5]}>
-        <PickleballModel scale={0.5} />
+      <group position={[1, 0, 0.5]}>
+        <PickleballModel scale={scale * 0.7} />
       </group>
     </group>
   );

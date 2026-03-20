@@ -17,38 +17,76 @@ import { Navbar } from "@/components/Navbar";
 import { PickleballModel } from "@/components/PickleballModel";
 import { RoundedPaddleModel } from "@/components/RoundedPaddleModel";
 import { SetModel } from "@/components/SetModel";
+import { prices } from "@/constants";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 export default function Page() {
   const [activeItem, setActiveItem] = useState<"Pickleball" | "Paddle" | "Set">(
     "Pickleball",
   );
-  const [isHovered, setIsHovered] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const groupRef = useRef<THREE.Group>(null);
 
-  const prices = {
-    Pickleball: "$12.00",
-    Paddle: "$149.00",
-    Set: "$299.00",
+  const scales = {
+    Pickleball: { sm: 1, md: 1.2, lg: 1.3, xl: 1.5 },
+    Paddle: { sm: 0.6, md: 0.8, lg: 1, xl: 1 },
+    Set: { sm: 0.5, md: 0.7, lg: 0.9, xl: 1 },
   };
+  const breakpoint = useBreakpoint();
+  const currentScale = scales[activeItem][breakpoint];
+  const items = ["Pickleball", "Paddle", "Set"] as const;
+  const [index, setIndex] = useState(0);
+  const isAnimating = useRef(false);
+  const [modelLoaded, setModelLoaded] = useState(false);
 
   useEffect(() => {
-    if (titleRef.current) {
-      gsap.fromTo(
-        titleRef.current,
-        { y: 100, opacity: 0, scale: 0.8 },
-        { y: 0, opacity: 1, scale: 1, duration: 1.5, ease: "expo.out" },
-      );
-    }
-    if (groupRef.current) {
-      gsap.fromTo(
-        groupRef.current.scale,
-        { x: 0, y: 0, z: 0 },
-        { x: 1, y: 1, z: 1, duration: 0.8, ease: "circ.out" },
-      );
-    }
-  }, [activeItem]);
+    setActiveItem(items[index]);
+
+    const timeout = setTimeout(() => {
+      isAnimating.current = false;
+    }, 900); // match animation duration
+
+    return () => clearTimeout(timeout);
+  }, [index]);
+
+  useEffect(() => {
+    const handleScroll = (e: WheelEvent) => {
+      if (isAnimating.current) return;
+
+      if (e.deltaY > 0 && index < items.length - 1) {
+        isAnimating.current = true;
+        setIndex((prev) => prev + 1);
+      }
+
+      if (e.deltaY < 0 && index > 0) {
+        isAnimating.current = true;
+        setIndex((prev) => prev - 1);
+      }
+    };
+
+    window.addEventListener("wheel", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("wheel", handleScroll);
+  }, [index]);
+
+  useEffect(() => {
+    if (!groupRef.current || !modelLoaded) return;
+
+    const tl = gsap.timeline();
+
+    // Reset instantly
+    tl.set(groupRef.current.position, {
+      y: 2,
+    });
+
+    // Enter animation
+    tl.to(groupRef.current.position, {
+      y: 0,
+      duration: 1,
+      ease: "power3.out",
+    });
+  }, [activeItem, modelLoaded]);
 
   return (
     <main
@@ -59,9 +97,14 @@ export default function Page() {
 
       {/* Background Text - Centered and Huge */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <h1
+        <motion.h1
+          key={activeItem}
           ref={titleRef}
-          className="text-[20vw] md:text-[25vw] font-black uppercase italic tracking-tighter leading-none opacity-10 select-none"
+          initial={{ y: 100, opacity: 0, scale: 0.8 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: -100, opacity: 0, scale: 1.2 }}
+          transition={{ duration: 1, ease: "easeInOut" }}
+          className="text-[20vw] md:text-[25vw] font-black uppercase italic tracking-tighter leading-none  select-none"
           style={{
             WebkitTextStroke: "2px rgba(212,255,0,0.2)",
             color: "transparent",
@@ -72,13 +115,13 @@ export default function Page() {
             : activeItem === "Paddle"
               ? "BLADE"
               : "CORE"}
-        </h1>
+        </motion.h1>
       </div>
 
       {/* Hero Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen">
         {/* 3D Canvas Container - Centered */}
-        <div className="w-full h-screen">
+        <div className="w-full max-w-4xl h-screen">
           <Canvas shadows dpr={[1, 2]}>
             <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={40}>
               {/* Main Spotlight focused on the pickleball */}
@@ -89,11 +132,11 @@ export default function Page() {
                 intensity={2}
                 castShadow
               />
-              <pointLight position={[-5, -5, -5]} intensity={1} />
+              <pointLight position={[0, 2, -8]} intensity={4} color="white" />
             </PerspectiveCamera>
 
             {/* Ambient Light */}
-            <ambientLight intensity={0.4} />
+            <ambientLight intensity={0.5} />
 
             {/* Main Spotlight focused on the scene center */}
             <spotLight
@@ -107,17 +150,18 @@ export default function Page() {
 
             <Environment preset="night" />
 
-            <AnimatePresence mode="wait">
-              <group
-                ref={groupRef}
-                onPointerOver={() => setIsHovered(true)}
-                onPointerOut={() => setIsHovered(false)}
-              >
-                {activeItem === "Pickleball" && <PickleballModel />}
-                {activeItem === "Paddle" && <RoundedPaddleModel />}
-                {activeItem === "Set" && <SetModel />}
-              </group>
-            </AnimatePresence>
+            <group ref={groupRef}>
+              {activeItem === "Pickleball" && (
+                <PickleballModel
+                  scale={currentScale}
+                  onLoaded={() => setModelLoaded(true)}
+                />
+              )}
+              {activeItem === "Paddle" && (
+                <RoundedPaddleModel scale={currentScale} />
+              )}
+              {activeItem === "Set" && <SetModel scale={currentScale} />}
+            </group>
 
             <ContactShadows
               position={[0, -3, 0]}
@@ -130,7 +174,7 @@ export default function Page() {
             <OrbitControls
               enableZoom={false}
               enablePan={false}
-              autoRotate={isHovered} // Only rotate when hovered
+              autoRotate={true}
               autoRotateSpeed={2}
               maxPolarAngle={Math.PI / 2}
               minPolarAngle={Math.PI / 2}
@@ -141,8 +185,10 @@ export default function Page() {
         {/* Pricing & Item Info */}
         <motion.div
           key={`info-${activeItem}`}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, x: "-100vw" }} // start completely off-screen left
+          animate={{ opacity: 1, x: 0 }} // slide into position
+          exit={{ opacity: 0, x: "-100vw" }} // slide back out to the left
+          transition={{ duration: 1, ease: "easeInOut" }}
           className="absolute left-8 bottom-32 md:left-12 md:bottom-12 z-20"
         >
           <p className="text-[#d4ff00] text-xs font-bold uppercase tracking-[0.3em] mb-2">
@@ -167,7 +213,10 @@ export default function Page() {
           {(["Pickleball", "Paddle", "Set"] as const).map((item) => (
             <button
               key={item}
-              onClick={() => setActiveItem(item)}
+              onClick={() => {
+                const i = items.indexOf(item);
+                setIndex(i);
+              }}
               className={`group flex items-center gap-4 transition-all duration-300 ${
                 activeItem === item
                   ? "text-[#d4ff00]"
@@ -200,7 +249,7 @@ export default function Page() {
             color: "#000",
           }}
           whileTap={{ scale: 0.95 }}
-          className="absolute bottom-12 z-20 flex items-center gap-3 border border-white/20 bg-white/5 backdrop-blur-sm text-white px-10 py-5 rounded-full font-black uppercase tracking-tighter transition-all"
+          className="absolute bottom-12 z-20 flex items-center gap-3 border border-white/20 bg-white/5 backdrop-blur-sm text-white px-10 py-5 rounded-full font-black uppercase tracking-tighter cursor-pointer"
         >
           Customize Now <ChevronRight size={20} />
         </motion.button>
@@ -211,19 +260,6 @@ export default function Page() {
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(212,255,0,0.05)_0%,transparent_70%)]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#d4ff00]/5 rounded-full blur-[150px]" />
       </div>
-
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap");
-
-        body {
-          background-color: #000;
-        }
-
-        .outline-text {
-          color: transparent;
-          -webkit-text-stroke: 1px rgba(212, 255, 0, 0.1);
-        }
-      `}</style>
     </main>
   );
 }
