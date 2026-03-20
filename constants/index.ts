@@ -1,7 +1,7 @@
 export const prices = {
-  Pickleball: "$12.00",
-  Paddle: "$149.00",
-  Set: "$299.00",
+  Pickleball: "$29.99",
+  Paddle: "$149.99",
+  Set: "$299.99",
 };
 
 export const itemDetails = {

@@ -41,10 +41,17 @@ export const ModelControls = ({ groupRef, activeItem }: ModelControlsProps) => {
         if (first) {
           last.current = { ...rotation.current };
         }
-
         // Apply delta relative to where the last drag ended
+        const currentX = rotation.current.x;
+
+        // Check if object is upside down
+        const isUpsideDown = Math.cos(currentX) < 0;
+
+        // Flip horizontal rotation direction if upside down
+        const direction = isUpsideDown ? -1 : 1;
+
         rotation.current.y =
-          last.current.y + (mx / window.innerWidth) * Math.PI * 2;
+          last.current.y + direction * (mx / window.innerWidth) * Math.PI * 2;
 
         rotation.current.x =
           last.current.x + (my / window.innerHeight) * Math.PI * 0.5;
