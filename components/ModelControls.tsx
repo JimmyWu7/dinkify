@@ -9,14 +9,19 @@ import gsap from "gsap";
 interface ModelControlsProps {
   groupRef: React.RefObject<THREE.Group | null>;
   activeItem: "Pickleball" | "Paddle" | "Set";
+  viewMode: "main" | "details";
 }
 
-export const ModelControls = ({ groupRef, activeItem }: ModelControlsProps) => {
+export const ModelControls = ({
+  groupRef,
+  activeItem,
+  viewMode,
+}: ModelControlsProps) => {
   const { gl } = useThree(); // 👈 access canvas
   const rotation = useRef({ x: 0, y: 0 });
   const last = useRef({ x: 0, y: 0 });
 
-  // Reset rotation whenever activeItem changes
+  // Reset rotation whenever activeItem changes or viewMode changes
   useEffect(() => {
     rotation.current = { x: 0, y: 0 };
     last.current = { x: 0, y: 0 };
@@ -30,7 +35,7 @@ export const ModelControls = ({ groupRef, activeItem }: ModelControlsProps) => {
         ease: "power3.out",
       });
     }
-  }, [activeItem, groupRef]);
+  }, [activeItem, viewMode, groupRef]);
 
   useGesture(
     {
