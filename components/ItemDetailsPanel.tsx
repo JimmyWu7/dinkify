@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
-  CheckCircle2,
   Ruler,
   ShieldCheck,
   Layers,

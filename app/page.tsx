@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { PerspectiveCamera } from "three";
 import { PickleballModel } from "@/components/PickleballModel";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
-import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
 import { RoundedPaddleModel } from "@/components/RoundedPaddleModel";
 import { SetModel } from "@/components/SetModel";
 import { prices } from "@/constants";
@@ -16,8 +14,8 @@ import { BackgroundText } from "@/components/BackgroundText";
 import { ItemSelector } from "@/components/ItemSelector";
 import { useScrollIndex } from "@/hooks/use-scroll";
 import { ItemDetailsPanel } from "@/components/ItemDetailsPanel";
-import CustomizePanel from "@/components/CustomizePanel";
-import { switchDarkLightLogo, switchTextColor } from "@/utils/color";
+import { CustomizePanel } from "@/components/CustomizePanel";
+import { switchTextColor } from "@/utils/color";
 import { CartPanel } from "@/components/CartPanel";
 
 interface CartItem {

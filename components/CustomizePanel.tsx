@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Palette, Check } from "lucide-react";
 import { COLORS } from "../constants/colors";
@@ -13,12 +13,20 @@ interface CustomizePanelProps {
   currentThemeColor: string;
 }
 
-const CustomizePanel: React.FC<CustomizePanelProps> = ({
+export const CustomizePanel = ({
   isOpen,
   onClose,
   setThemeColor,
   currentThemeColor,
-}) => {
+}: CustomizePanelProps) => {
+  const [previewColor, setPreviewColor] = useState(currentThemeColor);
+
+  useEffect(() => {
+    if (isOpen) {
+      setPreviewColor(currentThemeColor);
+    }
+  }, [isOpen, currentThemeColor]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -43,7 +51,7 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
               <div>
                 <div
                   className="flex items-center gap-3 mb-4"
-                  style={{ color: switchTextColor(currentThemeColor) }}
+                  style={{ color: switchTextColor(previewColor) }}
                 >
                   <Palette size={20} />
                   <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-80">
@@ -76,19 +84,19 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       className="relative flex flex-col items-center gap-3 group"
-                      onClick={() => setThemeColor(colorValue)}
+                      onClick={() => setPreviewColor(colorValue)}
                     >
                       <div
                         className="w-12 h-12 rounded-2xl cursor-pointer border-2 transition-all duration-300 flex items-center justify-center"
                         style={{
                           backgroundColor: colorValue,
                           borderColor:
-                            currentThemeColor === colorValue
+                            previewColor === colorValue
                               ? "white"
                               : "transparent",
                         }}
                       >
-                        {currentThemeColor === colorValue && (
+                        {previewColor === colorValue && (
                           <Check
                             size={20}
                             className={
@@ -111,13 +119,16 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
                 <motion.button
                   whileHover={{
                     scale: 1.02,
-                    backgroundColor: currentThemeColor,
-                    color: switchDarkLightLogo(currentThemeColor),
+                    backgroundColor: previewColor,
+                    color: switchDarkLightLogo(previewColor),
                     boxShadow: "0 0 0 2px rgba(255,255,255,0.1)",
                   }}
                   transition={{ duration: 0.3 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={onClose}
+                  onClick={() => {
+                    setThemeColor(previewColor);
+                    onClose();
+                  }}
                   className="w-full py-5 bg-white text-black font-black uppercase tracking-tighter rounded-2xl cursor-pointer"
                 >
                   Apply Configuration
@@ -130,5 +141,3 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
     </AnimatePresence>
   );
 };
-
-export default CustomizePanel;

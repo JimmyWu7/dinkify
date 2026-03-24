@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ShoppingCart, User, Zap } from "lucide-react";
 import { switchTextColor, switchDarkLightLogo } from "@/utils/color";

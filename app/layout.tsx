@@ -11,6 +11,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Dinkify | 3D PickleBall Customization",
   description: "Customize your pickleball gear with Dinkify.",
+  icons: {
+    icon: "/zap.svg",
+    shortcut: "/zap.svg",
+    apple: "/zap.svg",
+  },
 };
 
 export default function RootLayout({

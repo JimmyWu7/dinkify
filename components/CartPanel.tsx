@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -11,7 +11,7 @@ import {
   ArrowRight,
   CreditCard,
 } from "lucide-react";
-import { switchDarkLightLogo, switchTextColor } from "@/utils/color";
+import { switchTextColor } from "@/utils/color";
 
 interface CartItem {
   id: string;

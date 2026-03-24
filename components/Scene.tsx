@@ -42,7 +42,6 @@ const ModelTracker = ({
       return { x, y };
     };
 
-    // store function on window (quick + clean for now)
     (window as any).__getModelScreenPosition = updatePosition;
   }, [camera, size, activeComponent]);
 
