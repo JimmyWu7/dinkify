@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Dinkify | Modern Pickleball",
+  title: "Dinkify | 3D PickleBall Customization",
   description: "Customize your pickleball gear with Dinkify.",
 };
 
