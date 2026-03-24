@@ -59,21 +59,21 @@ export default function Page() {
     color: string;
   } | null>(null);
 
+  const [modelScreenPos, setModelScreenPos] = useState({ x: 0, y: 0 });
+
   const addToCart = (e: React.MouseEvent) => {
-    const bagEl = document.getElementById("bag-button");
     const cartEl = document.getElementById("cart-button");
-    if (!cartEl || !bagEl) return;
+    if (!cartEl) return;
 
     const cartRect = cartEl.getBoundingClientRect();
-    const bagRect = bagEl.getBoundingClientRect();
+    const getModelPos = (window as any).__getModelScreenPosition;
+    const modelPos = getModelPos ? getModelPos() : null;
 
-    // TODO: Need to resolve the flying item
+    const startX = modelPos?.x ?? window.innerWidth / 2;
+    const startY = modelPos?.y ?? window.innerHeight / 2;
 
-    const startX = bagRect.top;
-    const startY = bagRect.top;
-
-    const endX = cartRect.left;
-    const endY = cartRect.top;
+    const endX = cartRect.left + cartRect.width / 2;
+    const endY = cartRect.top + cartRect.height / 2;
 
     setFlyingItem({
       startX,
@@ -92,9 +92,6 @@ export default function Page() {
       color: themeColor,
       quantity: 1,
     };
-
-    // Animation start position
-    // setFlyingItem({ x: e.clientX, y: e.clientY, color: themeColor });
 
     setCart((prev) => {
       const existing = prev.find(
@@ -159,6 +156,7 @@ export default function Page() {
               <Scene
                 activeComponent={activeItem.component}
                 color={themeColor}
+                onModelScreenPosition={setModelScreenPos}
               />
             </div>
 
@@ -262,25 +260,44 @@ export default function Page() {
             <AnimatePresence>
               {flyingItem && (
                 <motion.div
+                  className="fixed pointer-events-none z-200"
+                  style={{
+                    width: 120,
+                    height: 120,
+                  }}
                   initial={{
-                    x: flyingItem.startX,
-                    y: flyingItem.startY,
+                    left: flyingItem.startX,
+                    top: flyingItem.startY,
                     scale: 1,
                     opacity: 1,
                   }}
                   animate={{
-                    x: flyingItem.endX,
-                    y: flyingItem.endY,
-                    scale: 0.2,
-                    opacity: 0,
+                    left: [flyingItem.startX, flyingItem.endX - 50],
+                    top: [flyingItem.startY, flyingItem.endY - 50],
+                    scale: [1, 0.4],
+                    opacity: [1, 0.4],
+                    rotate: 25,
                   }}
-                  transition={{ duration: 4.0, ease: [0.16, 1, 0.3, 1] }}
-                  className="fixed w-12 h-12 rounded-full z-200 pointer-events-none"
-                  style={{
-                    backgroundColor: flyingItem.color,
-                    boxShadow: `0 0 20px ${flyingItem.color}`,
+                  transition={{
+                    duration: 1.4,
+                    ease: [0.22, 1, 0.36, 1],
                   }}
-                />
+                >
+                  <Canvas camera={{ fov: 20, position: [0, 0, 7] }}>
+                    <ambientLight intensity={1.2} />
+                    <directionalLight position={[5, 5, 5]} intensity={1.2} />
+
+                    {activeItem.component === "Ball" && (
+                      <PickleballModel color={flyingItem.color} />
+                    )}
+                    {activeItem.component === "Paddle" && (
+                      <RoundedPaddleModel color={flyingItem.color} />
+                    )}
+                    {activeItem.component === "Set" && (
+                      <SetModel color={flyingItem.color} />
+                    )}
+                  </Canvas>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>

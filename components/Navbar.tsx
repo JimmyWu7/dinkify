@@ -112,7 +112,8 @@ export const Navbar = ({
           onClick={onCartClick}
           whileHover={{ color: switchTextColor(themeColor), scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          transition={{ duration: 0.3 }}
+          animate={cartCount > 0 ? { scale: [1, 1.25, 1] } : {}}
+          transition={{ duration: 0.4 }}
           className="relative text-white cursor-pointer"
         >
           <ShoppingCart size={20} />

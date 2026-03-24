@@ -1,7 +1,8 @@
 import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { AnimatePresence, motion } from "framer-motion";
-import React from "react";
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
 import { PickleballModel } from "./PickleballModel";
 import { RoundedPaddleModel } from "./RoundedPaddleModel";
 import { SetModel } from "./SetModel";
@@ -9,9 +10,56 @@ import { SetModel } from "./SetModel";
 interface SceneProps {
   activeComponent: "Ball" | "Paddle" | "Set";
   color: string;
+  onModelScreenPosition?: (pos: { x: number; y: number }) => void;
 }
 
-export const Scene = ({ activeComponent, color }: SceneProps) => {
+const ModelTracker = ({
+  activeComponent,
+  color,
+  onModelScreenPosition,
+}: SceneProps) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const { camera, size } = useThree();
+
+  useEffect(() => {
+    if (!groupRef.current) return;
+
+    const updatePosition = () => {
+      const vector = new THREE.Vector3();
+      groupRef.current!.getWorldPosition(vector);
+
+      vector.project(camera);
+
+      const canvas = document.querySelector("canvas");
+      if (!canvas) return { x: 0, y: 0 };
+
+      const rect = canvas.getBoundingClientRect();
+
+      const x = (vector.x * 0.5 + 0.5) * rect.width + rect.left;
+
+      const y = (-(vector.y * 0.5) + 0.5) * rect.height + rect.top;
+
+      return { x, y };
+    };
+
+    // store function on window (quick + clean for now)
+    (window as any).__getModelScreenPosition = updatePosition;
+  }, [camera, size, activeComponent]);
+
+  return (
+    <group ref={groupRef}>
+      {activeComponent === "Ball" && <PickleballModel color={color} />}
+      {activeComponent === "Paddle" && <RoundedPaddleModel color={color} />}
+      {activeComponent === "Set" && <SetModel color={color} />}
+    </group>
+  );
+};
+
+export const Scene = ({
+  activeComponent,
+  color,
+  onModelScreenPosition,
+}: SceneProps) => {
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -64,23 +112,11 @@ export const Scene = ({ activeComponent, color }: SceneProps) => {
             enableRotate={true}
           />
 
-          <AnimatePresence mode="wait">
-            {activeComponent === "Ball" && (
-              <group key="pickleball">
-                <PickleballModel color={color} />
-              </group>
-            )}
-            {activeComponent === "Paddle" && (
-              <group key="paddle">
-                <RoundedPaddleModel color={color} />
-              </group>
-            )}
-            {activeComponent === "Set" && (
-              <group key="set">
-                <SetModel color={color} />
-              </group>
-            )}
-          </AnimatePresence>
+          <ModelTracker
+            activeComponent={activeComponent}
+            color={color}
+            onModelScreenPosition={onModelScreenPosition}
+          />
         </Canvas>
       </motion.div>
     </AnimatePresence>
