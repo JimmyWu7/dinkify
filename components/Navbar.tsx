@@ -1,24 +1,29 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ShoppingCart, User, Zap } from "lucide-react";
-import CustomizePanel from "../components/CustomizePanel"; // Import the panel component
-import { COLORS } from "../constants/colors"; // Import your color constants
 import { switchTextColor, switchDarkLightLogo } from "@/utils/color";
 
 interface NavbarProps {
   themeColor: string;
   onCustomizeClick: () => void;
+  cartCount: number;
+  onCartClick: () => void;
 }
 
-export const Navbar = ({ themeColor, onCustomizeClick }: NavbarProps) => {
+export const Navbar = ({
+  themeColor,
+  onCustomizeClick,
+  cartCount,
+  onCartClick,
+}: NavbarProps) => {
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="fixed h-header w-full z-50 flex items-center justify-between px-8 py-6 bg-black/50 border border-white/5"
+      className="fixed h-header w-full z-40 flex items-center justify-between px-8 py-6 bg-black/50 border border-white/5"
     >
       <motion.div
         variants={{
@@ -82,7 +87,7 @@ export const Navbar = ({ themeColor, onCustomizeClick }: NavbarProps) => {
               className="text-white font-semibold cursor-pointer"
             >
               <a
-                href="https://github.com/JimmyWu7"
+                href="https://www.linkedin.com/in/jimmywu7/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -103,27 +108,37 @@ export const Navbar = ({ themeColor, onCustomizeClick }: NavbarProps) => {
           <User size={20} />
         </motion.button>
         <motion.button
+          id="cart-button"
+          onClick={onCartClick}
           whileHover={{ color: switchTextColor(themeColor), scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           transition={{ duration: 0.3 }}
           className="relative text-white cursor-pointer"
         >
           <ShoppingCart size={20} />
-          <span
-            className="absolute -top-2 -right-2 text-[10px] font-black px-1.5 py-0.5 rounded-full transition-colors duration-500"
-            style={{
-              backgroundColor: themeColor,
-              color: switchDarkLightLogo(themeColor),
-              fill: switchDarkLightLogo(themeColor),
-              border: `1px solid ${
-                themeColor === "#FFFFFF"
-                  ? "rgba(255,255,255,0.2)"
-                  : "transparent"
-              }`,
-            }}
-          >
-            2
-          </span>
+          <AnimatePresence>
+            {cartCount > 0 && (
+              <motion.span
+                key="cart-badge"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
+                className="absolute -top-2 -right-2 text-[10px] font-black px-1.5 py-0.5 rounded-full transition-colors duration-500"
+                style={{
+                  backgroundColor: themeColor,
+                  color: switchDarkLightLogo(themeColor),
+                  fill: switchDarkLightLogo(themeColor),
+                  border: `1px solid ${
+                    themeColor === "#FFFFFF"
+                      ? "rgba(255,255,255,0.2)"
+                      : "transparent"
+                  }`,
+                }}
+              >
+                {cartCount}
+              </motion.span>
+            )}
+          </AnimatePresence>
         </motion.button>
       </div>
     </motion.nav>

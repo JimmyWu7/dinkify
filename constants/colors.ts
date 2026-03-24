@@ -1,5 +1,5 @@
 export const COLORS = {
-  green: "#d4ff00", // Your default green color
+  green: "#d4ff00", // default
   red: "#FF5733",
   blue: "#007BFF",
   yellow: "#FFEB3B",
@@ -8,5 +8,4 @@ export const COLORS = {
   black: "#000000",
   white: "#FFFFFF",
   grey: "#B0BEC5",
-  // Add more colors as needed
 };

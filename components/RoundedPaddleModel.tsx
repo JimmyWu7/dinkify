@@ -98,7 +98,7 @@ export const RoundedPaddleModel = ({
         {/* Main Paddle Face */}
         <mesh castShadow receiveShadow>
           <extrudeGeometry args={[paddleShape, extrudeSettings]} />
-          {/* Material 0 → front & back faces */}
+          {/* Front and Back Faces */}
           <meshStandardMaterial
             attach="material-0"
             color="#222222"
@@ -106,7 +106,7 @@ export const RoundedPaddleModel = ({
             metalness={0.8}
           />
 
-          {/* Material 1 → sides (the border) */}
+          {/* The Border */}
           <meshStandardMaterial
             attach="material-1"
             color={color}
@@ -153,8 +153,8 @@ export const RoundedPaddleModel = ({
         {/* Zap logo on Handle Bottom */}
         <mesh
           geometry={zapGeometry}
-          position={[0, -2.4, 0.05]} // bottom of handle + pushed forward
-          rotation={[Math.PI / 2, 0, 0]} // face outward from bottom
+          position={[0, -2.4, 0.05]}
+          rotation={[Math.PI / 2, 0, 0]}
           scale={0.01}
         >
           <meshStandardMaterial

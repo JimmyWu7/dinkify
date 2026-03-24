@@ -85,7 +85,7 @@ export const ItemDetailsPanel = ({
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={onClose}
-                  className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-white/40 hover:text-white"
+                  className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-white/40 hover:text-white cursor-pointer"
                 >
                   <X size={24} />
                 </motion.button>
@@ -110,7 +110,7 @@ export const ItemDetailsPanel = ({
                   transition={{ delay: 0.3 }}
                   className="grid grid-cols-1 gap-4"
                 >
-                  <div className="group flex items-center gap-6 p-6 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/5 transition-all duration-500">
+                  <div className="group flex items-center gap-6 p-6 bg-white/3 hover:bg-white/6 rounded-3xl border border-white/5 transition-all duration-500">
                     <div
                       className="w-14 h-14 rounded-2xl bg-[#d4ff00]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
                       style={{ color: switchTextColor(color) }}
@@ -127,7 +127,7 @@ export const ItemDetailsPanel = ({
                     </div>
                   </div>
 
-                  <div className="group flex items-center gap-6 p-6 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/5 transition-all duration-500">
+                  <div className="group flex items-center gap-6 p-6 bg-white/3 hover:bg-white/6 rounded-3xl border border-white/5 transition-all duration-500">
                     <div
                       className="w-14 h-14 rounded-2xl bg-[#d4ff00]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
                       style={{ color: switchTextColor(color) }}
@@ -144,7 +144,7 @@ export const ItemDetailsPanel = ({
                     </div>
                   </div>
 
-                  <div className="group flex items-center gap-6 p-6 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/5 transition-all duration-500">
+                  <div className="group flex items-center gap-6 p-6 bg-white/3 hover:bg-white/6 rounded-3xl border border-white/5 transition-all duration-500">
                     <div
                       className="w-14 h-14 rounded-2xl bg-[#d4ff00]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
                       style={{ color: switchTextColor(color) }}

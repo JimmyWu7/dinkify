@@ -43,15 +43,11 @@ export const Scene = ({ activeComponent, color }: SceneProps) => {
             shadow-mapSize-height={1024}
           />
 
-          {/* Fill light (softens shadows) */}
+          {/* Fill light */}
           <directionalLight position={[-5, 2, 3]} intensity={0.4} />
 
-          {/* Rim light (edge highlight 🔥) */}
-          <directionalLight
-            position={[0, 5, -5]}
-            intensity={1}
-            color={color} // subtle neon tint (optional)
-          />
+          {/* Rim light */}
+          <directionalLight position={[0, 5, -5]} intensity={1} color={color} />
 
           {/* Ground shadow */}
           <ContactShadows

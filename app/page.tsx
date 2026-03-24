@@ -10,14 +10,24 @@ import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
 import { RoundedPaddleModel } from "@/components/RoundedPaddleModel";
 import { SetModel } from "@/components/SetModel";
 import { prices } from "@/constants";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ShoppingBag } from "lucide-react";
 import { Scene } from "@/components/Scene";
 import { BackgroundText } from "@/components/BackgroundText";
 import { ItemSelector } from "@/components/ItemSelector";
 import { useScrollIndex } from "@/hooks/use-scroll";
 import { ItemDetailsPanel } from "@/components/ItemDetailsPanel";
 import CustomizePanel from "@/components/CustomizePanel";
-import { switchTextColor } from "@/utils/color";
+import { switchDarkLightLogo, switchTextColor } from "@/utils/color";
+import { CartPanel } from "@/components/CartPanel";
+
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  component: "Ball" | "Paddle" | "Set";
+  color: string;
+  quantity: number;
+}
 
 export default function Page() {
   type Item = {
@@ -32,12 +42,95 @@ export default function Page() {
   ];
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const isScrollDisabled = isDetailsOpen || isCustomizeOpen;
+  const isScrollDisabled = isDetailsOpen || isCustomizeOpen || isCartOpen;
   const [index, setIndex] = useScrollIndex(items.length, 800, isScrollDisabled);
 
   const activeItem = items[index];
   const [themeColor, setThemeColor] = useState("#d4ff00");
+
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [flyingItem, setFlyingItem] = useState<{
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    color: string;
+  } | null>(null);
+
+  const addToCart = (e: React.MouseEvent) => {
+    const bagEl = document.getElementById("bag-button");
+    const cartEl = document.getElementById("cart-button");
+    if (!cartEl || !bagEl) return;
+
+    const cartRect = cartEl.getBoundingClientRect();
+    const bagRect = bagEl.getBoundingClientRect();
+
+    // TODO: Need to resolve the flying item
+
+    const startX = bagRect.top;
+    const startY = bagRect.top;
+
+    const endX = cartRect.left;
+    const endY = cartRect.top;
+
+    setFlyingItem({
+      startX,
+      startY,
+      endX,
+      endY,
+      color: themeColor,
+    });
+
+    const price = parseFloat(prices[activeItem.component].replace("$", ""));
+    const newItem: CartItem = {
+      id: `${activeItem.name}-${themeColor}-${Date.now()}`,
+      name: activeItem.name,
+      price,
+      component: activeItem.component,
+      color: themeColor,
+      quantity: 1,
+    };
+
+    // Animation start position
+    // setFlyingItem({ x: e.clientX, y: e.clientY, color: themeColor });
+
+    setCart((prev) => {
+      const existing = prev.find(
+        (item) => item.name === newItem.name && item.color === newItem.color,
+      );
+      if (existing) {
+        return prev.map((item) =>
+          item.id === existing.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
+        );
+      }
+      return [...prev, newItem];
+    });
+
+    // Reset flying item after animation
+    setTimeout(() => setFlyingItem(null), 800);
+  };
+
+  const updateQuantity = (id: string, delta: number) => {
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.id === id
+            ? { ...item, quantity: Math.max(0, item.quantity + delta) }
+            : item,
+        )
+        .filter((item) => item.quantity > 0),
+    );
+  };
+
+  const removeItem = (id: string) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden">
@@ -45,6 +138,8 @@ export default function Page() {
         <Navbar
           themeColor={themeColor}
           onCustomizeClick={() => setIsCustomizeOpen(true)}
+          cartCount={cartCount}
+          onCartClick={() => setIsCartOpen(true)}
         />
       </header>
 
@@ -121,7 +216,7 @@ export default function Page() {
               </AnimatePresence>
             </div>
             {/* Customize Button */}
-            <div className="w-full flex justify-center items-center py-4 order-3 md:order-2">
+            <div className="w-full flex justify-center items-center gap-4 py-4 order-3 md:order-2">
               <motion.button
                 onClick={() => setIsCustomizeOpen(true)}
                 whileHover={{
@@ -131,9 +226,27 @@ export default function Page() {
                 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 whileTap={{ scale: 0.95 }}
-                className="z-20 flex items-center justify-center gap-3 border border-white/20 bg-white/5 backdrop-blur-sm text-white px-10 py-5 rounded-full font-black uppercase tracking-tighter cursor-pointer"
+                className="z-20 flex items-center justify-center gap-2 md:gap-4 border border-white/20 bg-white/5 backdrop-blur-sm text-white text-xs px-4 lg:px-10 py-2 lg:py-5 rounded-xl lg:rounded-full font-black uppercase tracking-tighter cursor-pointer"
               >
                 Customize Now <ChevronRight size={20} />
+              </motion.button>
+              <motion.button
+                id="bag-button"
+                onClick={addToCart}
+                whileHover={{
+                  scale: 1.05,
+                }}
+                style={{
+                  backgroundColor:
+                    themeColor === "#000000" ? "#FFFFFF" : themeColor,
+                  color: themeColor === "#FFFFFF" ? "#000000" : "#000000",
+                }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                whileTap={{ scale: 0.95 }}
+                className="z-20 text-sm flex items-center justify-center gap-2 md:gap-4 backdrop-blur-sm px-4 lg:px-10 py-2 lg:py-5 rounded-full font-black uppercase tracking-tighter cursor-pointer border border-white/10"
+              >
+                Add to Bag
+                <ShoppingBag size={20} />
               </motion.button>
             </div>
 
@@ -144,6 +257,32 @@ export default function Page() {
               setIndex={setIndex}
               color={themeColor}
             />
+
+            {/* Flying Item Animation */}
+            <AnimatePresence>
+              {flyingItem && (
+                <motion.div
+                  initial={{
+                    x: flyingItem.startX,
+                    y: flyingItem.startY,
+                    scale: 1,
+                    opacity: 1,
+                  }}
+                  animate={{
+                    x: flyingItem.endX,
+                    y: flyingItem.endY,
+                    scale: 0.2,
+                    opacity: 0,
+                  }}
+                  transition={{ duration: 4.0, ease: [0.16, 1, 0.3, 1] }}
+                  className="fixed w-12 h-12 rounded-full z-200 pointer-events-none"
+                  style={{
+                    backgroundColor: flyingItem.color,
+                    boxShadow: `0 0 20px ${flyingItem.color}`,
+                  }}
+                />
+              )}
+            </AnimatePresence>
           </div>
           {/* Decorative Background Elements */}
           <div className="fixed inset-0 pointer-events-none">
@@ -170,6 +309,16 @@ export default function Page() {
             onClose={() => setIsCustomizeOpen(false)}
             setThemeColor={setThemeColor}
             currentThemeColor={themeColor}
+          />
+
+          {/* Cart Panel */}
+          <CartPanel
+            isOpen={isCartOpen}
+            onClose={() => setIsCartOpen(false)}
+            items={cart}
+            onUpdateQuantity={updateQuantity}
+            onRemoveItem={removeItem}
+            themeColor={themeColor}
           />
         </section>
       </main>

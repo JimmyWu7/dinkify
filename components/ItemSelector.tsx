@@ -32,8 +32,8 @@ export const ItemSelector = ({
             exit={{ opacity: 0, x: 100 }} // slide back out to the left
             transition={{ duration: 1.0, ease: "easeInOut" }}
             whileHover={{
-              opacity: 1, // On hover, make the text fully visible
-              scale: 1.2, // Slightly scale up the text
+              opacity: 1,
+              scale: 1.2,
             }}
             onClick={() => setIndex(items.indexOf(item))}
             className={`group flex items-center gap-4 ${
@@ -61,8 +61,8 @@ export const ItemSelector = ({
             </motion.span>
 
             <motion.div
-              initial={{ width: 32 }} // corresponds to w-8 (8*4px)
-              animate={{ width: activeItem === item ? 64 : 32 }} // 64px = w-16
+              initial={{ width: 32 }}
+              animate={{ width: activeItem === item ? 64 : 32 }}
               transition={{ duration: 0.8, ease: "easeInOut" }}
               className="relative h-1 bg-white/10 overflow-hidden"
             >
@@ -73,7 +73,6 @@ export const ItemSelector = ({
                     width: activeItem === item ? "100%" : "0%",
                   }}
                   className="absolute inset-0"
-                  // style={{ backgroundColor: getContrastTextColor(color) }}
                   transition={{ duration: 0.8, ease: "easeInOut" }}
                 />
               </AnimatePresence>
