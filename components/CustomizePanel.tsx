@@ -21,12 +21,6 @@ export const CustomizePanel = ({
 }: CustomizePanelProps) => {
   const [previewColor, setPreviewColor] = useState(currentThemeColor);
 
-  useEffect(() => {
-    if (isOpen) {
-      setPreviewColor(currentThemeColor);
-    }
-  }, [isOpen, currentThemeColor]);
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -45,7 +39,7 @@ export const CustomizePanel = ({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] md:w-[450px] bg-[#0a0a0a]/90 backdrop-blur-2xl border border-white/10 p-8 md:p-12 rounded-[40px] shadow-2xl z-[101]"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] md:w-[450px] bg-[#0a0a0a]/90 backdrop-blur-2xl border border-white/10 p-8 md:p-12 rounded-[40px] shadow-2xl z-101"
           >
             <div className="flex justify-between items-start mb-12">
               <div>

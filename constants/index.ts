@@ -1,5 +1,5 @@
 export const prices = {
-  Ball: "$29.99",
+  Ball: "$19.99",
   Paddle: "$149.99",
   Set: "$299.99",
 };

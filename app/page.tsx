@@ -320,6 +320,7 @@ export default function Page() {
 
           {/* Customize Panel */}
           <CustomizePanel
+            key={isCustomizeOpen ? "open" : "closed"}
             isOpen={isCustomizeOpen}
             onClose={() => setIsCustomizeOpen(false)}
             setThemeColor={setThemeColor}
